@@ -2,8 +2,8 @@
 
 This private Homebrew tap distributes Claudex.app and the bundled `claudex` CLI.
 Access is granted through this repository; testers do not need access to the
-application's source repository. No binary is available until the first
-prerelease appears on the [Releases page](https://github.com/snowell-io/homebrew-claudex/releases).
+application's source repository. Download details and checksums are on the
+[Releases page](https://github.com/snowell-io/homebrew-claudex/releases).
 
 ## Install
 
@@ -17,20 +17,30 @@ brew install gh
 gh auth login --hostname github.com
 gh auth setup-git --hostname github.com
 brew tap snowell-io/claudex https://github.com/snowell-io/homebrew-claudex.git
-HOMEBREW_CLAUDEX_GITHUB_TOKEN="$(gh auth token --hostname github.com)" \
-  brew install --cask snowell-io/claudex/claudex@alpha
+sh "$(brew --repository snowell-io/claudex)/install.sh"
 open -a Claudex
 ```
 
-The token is supplied to Homebrew for this command only. The cask uses the
-GitHub release asset API to authenticate its download. Homebrew 7 defers this
-token until download time instead of storing its value in cask metadata.
-Do not add a token to the tap, shell history, screenshots, or bug reports.
+The small `install.sh` wrapper runs `brew install --cask` with credentials from
+GitHub CLI. It writes a private temporary HTTP header file and deletes it when
+the command exits. The cask uses the GitHub release asset API to authenticate its
+download; Homebrew stores the temporary file path instead of the token in its
+metadata. Do not add a token to the tap, shell history, screenshots, or bug reports.
 For unattended use, a fine-grained GitHub token needs only Contents: Read access
 to this distribution repository, with organization approval if required.
 
 Homebrew may request trust for this private cask. Trust only
 `snowell-io/claudex/claudex@alpha` if prompted.
+
+## First launch of the unsigned alpha
+
+The initial alpha is ad-hoc signed for executable integrity, without a Developer
+ID certificate or Apple notarization. If macOS blocks the first launch, attempt
+to open Claudex, then go to **System Settings → Privacy & Security → Open Anyway**
+and confirm opening the app. See [Apple's instructions](https://support.apple.com/en-us/102445).
+The installer preserves quarantine; it does not disable Gatekeeper or remove
+security attributes. Permission may be required again after updating an ad-hoc
+signed build. Microphone and speech permissions may also need to be granted again.
 
 ## Update
 
@@ -42,8 +52,7 @@ backup for rollback.
 
 ```sh
 brew update
-HOMEBREW_CLAUDEX_GITHUB_TOKEN="$(gh auth token --hostname github.com)" \
-  brew upgrade --cask snowell-io/claudex/claudex@alpha
+sh "$(brew --repository snowell-io/claudex)/install.sh" upgrade
 ```
 
 Reopen the app and check history, drafts, settings and a disposable task before
@@ -60,6 +69,10 @@ brew uninstall --cask snowell-io/claudex/claudex@alpha
 Uninstall preserves application data and worktrees. This tap deliberately has no
 `zap` action that could delete conversation history or unsent attachments.
 
-Only Developer ID signed, Apple notarized archives are accepted by the
-publication script. Installation on a separate clean Mac remains a release
-validation step.
+The publication script requires Developer ID signing and notarization by default.
+This closed alpha uses its explicit `--allow-unsigned` mode. Installation and
+first-launch approval on a separate clean Mac remain validation steps.
+
+Known issue: the UI test for the bottom of a long workspace-folder list fails
+by 9 points on the current macOS/Xcode version. The Release build succeeds;
+the full test run had one failure and 15 skipped tests out of 382 tests.
