@@ -2,15 +2,13 @@ cask "claudex@alpha" do
   version "0.1.0,1"
   sha256 "6b3936f090dc13f1019bf1f4c9b846c7c64b6ccfe6caa0df5bbbee878524b844"
 
-  url "https://api.github.com/repos/snowell-io/homebrew-claudex/releases/assets/732771057",
-      header: ["Accept: application/octet-stream",
-               "@#{ENV.fetch("HOMEBREW_CLAUDEX_HEADERS_FILE", File::NULL)}"]
+  url "https://github.com/snowell-io/claudex-releases/releases/download/v0.1.0-alpha.1/Claudex-0.1.0-alpha.1-arm64.zip"
   name "Claudex Alpha"
-  desc "Private alpha of the native Claude Code workspace"
+  desc "Alpha of the native Claude Code workspace"
   homepage "https://github.com/snowell-io/homebrew-claudex"
 
   livecheck do
-    skip "Closed alpha releases are published manually"
+    skip "Alpha releases are published manually"
   end
 
   depends_on arch: :arm64
